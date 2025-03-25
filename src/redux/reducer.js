@@ -17,13 +17,7 @@ export const reducer = (state = initialState, action) => {
 		case 'SET_FIELD':
 			return { ...state, field: payload };
 		case 'SET_RESTARTGAME':
-			return {
-				...state,
-				currentPlayer: 'X',
-				field: Array(9).fill(''),
-				isGameEnded: false,
-				isDraw: false,
-			};
+			return initialState;
 		default:
 			return state;
 	}
