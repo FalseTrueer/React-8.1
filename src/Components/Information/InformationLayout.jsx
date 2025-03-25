@@ -1,5 +1,6 @@
 import styles from './Information.module.css';
 import PropTypes from 'prop-types';
+import React from 'react';
 
 export function InformationLayout({ isDraw, isGameEnded, currentPlayer }) {
 	return (

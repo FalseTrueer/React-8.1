@@ -1,19 +1,18 @@
 import styles from './Field.module.css';
 import PropTypes from 'prop-types';
+import { store } from '../../redux/store';
+import React, { useEffect, useState } from 'react';
 
-export function FieldLayout({
-	field,
-	isGameEnded,
-	currentPlayer,
-	setField,
-	setIsGameEnded,
-	setIsDraw,
-	setCurrentPlayer,
-	winPatterns,
-	checkWin,
-	buttonClick
-}) {
+export function FieldLayout({ buttonClick }) {
+	const { field } = store.getState();
+	const [_, setRerender] = useState(0);
 
+	useEffect(() => {
+		const unsubscribe = store.subscribe(() => {
+			setRerender((prev) => prev + 1);
+		});
+		return () => unsubscribe();
+	}, []);
 
 	return (
 		<ul className={styles.fieldUl}>
@@ -27,14 +26,5 @@ export function FieldLayout({
 }
 
 FieldLayout.propTypes = {
-	field: PropTypes.arrayOf(PropTypes.string).isRequired,
-	isGameEnded: PropTypes.bool.isRequired,
-	currentPlayer: PropTypes.string.isRequired,
-	setField: PropTypes.func.isRequired,
-	setIsGameEnded: PropTypes.func.isRequired,
-	setIsDraw: PropTypes.func.isRequired,
-	setCurrentPlayer: PropTypes.func.isRequired,
-	winPatterns: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.number)).isRequired,
-	checkWin: PropTypes.func.isRequired,
 	buttonClick: PropTypes.func.isRequired,
 };

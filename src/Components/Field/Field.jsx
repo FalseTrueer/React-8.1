@@ -1,30 +1,26 @@
 import { FieldLayout } from './FieldLayout';
+import { WIN_PATTERNS } from '../../constants/constants';
+import { store } from '../../redux/store';
+import React, { useEffect, useState } from 'react';
 
-const WIN_PATTERNS = [
-	[0, 1, 2],
-	[3, 4, 5],
-	[6, 7, 8],
-	[0, 3, 6],
-	[1, 4, 7],
-	[2, 5, 8],
-	[0, 4, 8],
-	[2, 4, 6],
-];
+export function Field() {
+	const { field, isGameEnded, currentPlayer } = store.getState();
+	const [_, setRerender] = useState(0);
 
-export function Field({
-	field,
-	isGameEnded,
-	currentPlayer,
-	setField,
-	setIsGameEnded,
-	setIsDraw,
-	setCurrentPlayer,
-}) {
-	function checkWin(field, curPlayer) {
+	useEffect(() => {
+		const unsubscribe = store.subscribe(() => {
+			setRerender((prev) => prev + 1);
+		});
+		return () => unsubscribe();
+	}, []);
+
+	function checkWin(field, currentPlayer) {
 		return WIN_PATTERNS.some((pattern) => {
 			const [a, b, c] = pattern;
 			return (
-				field[a] === curPlayer && field[b] === curPlayer && field[c] === curPlayer
+				field[a] === currentPlayer &&
+				field[b] === currentPlayer &&
+				field[c] === currentPlayer
 			);
 		});
 	}
@@ -36,32 +32,23 @@ export function Field({
 
 		const newField = [...field];
 		newField[ind] = currentPlayer;
-		setField(newField);
+		store.dispatch({ type: 'SET_FIELD', payload: newField });
 
 		if (checkWin(newField, currentPlayer)) {
-			setIsGameEnded(true);
+			store.dispatch({ type: 'SET_IS_GAME_ENDED', payload: true });
 			return;
 		}
 
 		if (!newField.includes('')) {
-			setIsDraw(true);
+			store.dispatch({ type: 'SET_IS_DRAW', payload: true });
 			return;
 		}
 
-		setCurrentPlayer(currentPlayer === 'X' ? 'O' : 'X');
+		store.dispatch({
+			type: 'SET_CURRENT_PLAYER',
+			payload: currentPlayer === 'X' ? 'O' : 'X',
+		});
 	}
 
-	return (
-		<FieldLayout
-			field={field}
-			isGameEnded={isGameEnded}
-			currentPlayer={currentPlayer}
-			setField={setField}
-			setIsGameEnded={setIsGameEnded}
-			setIsDraw={setIsDraw}
-			setCurrentPlayer={setCurrentPlayer}
-			checkWin={checkWin}
-			buttonClick={buttonClick}
-		/>
-	);
+	return <FieldLayout buttonClick={buttonClick} />;
 }
